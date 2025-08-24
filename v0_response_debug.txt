@@ -1,0 +1,443 @@
+<Thinking>
+The user wants a complete Next.js 14 TypeScript project with a ProfileCard component. I need to create:
+
+1. package.json with all necessary dependencies
+2. next.config.js configuration
+3. tailwind.config.js for Tailwind CSS
+4. app/page.tsx (using app router)
+5. components/ProfileCard.tsx
+
+I should keep it simple but complete, so I'll include:
+- Next.js 14 with TypeScript
+- Tailwind CSS for styling
+- A clean ProfileCard component with some basic profile information
+- Proper project structure
+
+Let me create each file with the appropriate content.
+</Thinking>
+
+I'll create a complete Next.js 14 TypeScript project with a ProfileCard component. Here's the full project structure:
+
+```json file="package.json"
+{
+  "name": "nextjs-profile-card",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.4.0"
+  }
+}
+```
+
+```js file="next.config.js"
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  experimental: {
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+}
+
+module.exports = nextConfig
+```
+
+```js file="tailwind.config.js"
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        card: 'hsl(var(--card))',
+        'card-foreground': 'hsl(var(--card-foreground))',
+        popover: 'hsl(var(--popover))',
+        'popover-foreground': 'hsl(var(--popover-foreground))',
+        primary: 'hsl(var(--primary))',
+        'primary-foreground': 'hsl(var(--primary-foreground))',
+        secondary: 'hsl(var(--secondary))',
+        'secondary-foreground': 'hsl(var(--secondary-foreground))',
+        muted: 'hsl(var(--muted))',
+        'muted-foreground': 'hsl(var(--muted-foreground))',
+        accent: 'hsl(var(--accent))',
+        'accent-foreground': 'hsl(var(--accent-foreground))',
+        destructive: 'hsl(var(--destructive))',
+        'destructive-foreground': 'hsl(var(--destructive-foreground))',
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+      },
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)',
+      },
+    },
+  },
+  plugins: [],
+}
+```
+
+```css file="app/globals.css"
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+```
+
+```css file="postcss.config.js"
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+```tsx file="components/ProfileCard.tsx"
+import Image from 'next/image'
+
+interface ProfileCardProps {
+  name: string
+  title: string
+  bio: string
+  avatar: string
+  location: string
+  email: string
+  followers: number
+  following: number
+}
+
+export default function ProfileCard({
+  name,
+  title,
+  bio,
+  avatar,
+  location,
+  email,
+  followers,
+  following,
+}: ProfileCardProps) {
+  return (
+    <div className="w-full max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+      {/* Header with gradient background */}
+      <div className="h-32 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+      
+      {/* Profile content */}
+      <div className="relative px-6 pb-6">
+        {/* Avatar */}
+        <div className="flex justify-center -mt-16 mb-4">
+          <div className="relative">
+            <Image
+              src={avatar}
+              alt={`${name}'s avatar`}
+              width={128}
+              height={128}
+              className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+            />
+            <div className="absolute bottom-2 right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+          </div>
+        </div>
+
+        {/* Profile info */}
+        <div className="text-center mb-4">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">{name}</h2>
+          <p className="text-purple-600 font-medium mb-2">{title}</p>
+          <p className="text-gray-600 text-sm leading-relaxed">{bio}</p>
+        </div>
+
+        {/* Contact info */}
+        <div className="space-y-2 mb-6">
+          <div className="flex items-center justify-center text-gray-600 text-sm">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+            </svg>
+            {location}
+          </div>
+          <div className="flex items-center justify-center text-gray-600 text-sm">
+            <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+            {email}
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="flex justify-center space-x-8 mb-6">
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900">{followers.toLocaleString()}</div>
+            <div className="text-gray-600 text-sm">Followers</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-gray-900">{following.toLocaleString()}</div>
+            <div className="text-gray-600 text-sm">Following</div>
+          </div>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex space-x-3">
+          <button className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors">
+            Follow
+          </button>
+          <button className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+            Message
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+```
+
+```tsx file="app/page.tsx"
+import ProfileCard from '@/components/ProfileCard'
+
+export default function Home() {
+  const profileData = {
+    name: 'Sarah Johnson',
+    title: 'Senior Frontend Developer',
+    bio: 'Passionate about creating beautiful and functional user interfaces. Love working with React, TypeScript, and modern web technologies.',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
+    location: 'San Francisco, CA',
+    email: 'sarah.johnson@example.com',
+    followers: 1234,
+    following: 567,
+  }
+
+  return (
+    <main className="min-h-screen bg-gray-100 py-12 px-4">
+      <div className="container mx-auto">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Profile Card Component
+          </h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            A beautiful and responsive profile card built with Next.js 14, TypeScript, and Tailwind CSS.
+          </p>
+        </div>
+        
+        <div className="flex justify-center">
+          <ProfileCard {...profileData} />
+        </div>
+      </div>
+    </main>
+  )
+}
+```
+
+```tsx file="app/layout.tsx"
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: 'Next.js Profile Card',
+  description: 'A beautiful profile card component built with Next.js 14 and TypeScript',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  )
+}
+```
+
+```json file="tsconfig.json"
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+```
+
+```env file=".env.example"
+# Add your environment variables here
+# NEXT_PUBLIC_API_URL=https://api.example.com
+```
+
+```text file=".gitignore"
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+```
+
+## Getting Started
+
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+2. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+3. **Open your browser:**
+   Navigate to `http://localhost:3000` to see your profile card.
+
+## Features
+
+- ✅ **Next.js 14** with App Router
+- ✅ **TypeScript** for type safety
+- ✅ **Tailwind CSS** for styling
+- ✅ **Responsive design**
+- ✅ **Modern ProfileCard component** with:
+  - Avatar with online status indicator
+  - Gradient header background
+  - Contact information
+  - Follower/following stats
+  - Action buttons
+- ✅ **Optimized images** with Next.js Image component
+- ✅ **Clean project structure**
+
+The ProfileCard component is fully customizable and accepts props for all the profile information. You can easily extend it with additional features like social media links, skills, or custom themes.
