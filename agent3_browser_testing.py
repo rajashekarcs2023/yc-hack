@@ -275,7 +275,7 @@ async def main():
                 markdown_content = actual_content
             
             # Find anchor point
-            lines = markdown_content.split('\\n')
+            lines = markdown_content.splitlines()
             anchor_line = None
             
             for line in lines:
@@ -359,7 +359,7 @@ async def run_agent3_workflow(url: str, project_name: str = "pixelpilot-project"
     print(f"\n🎭 STEP 2: Testing deployed app with spec comparison")
     analysis = browser_test_analysis(url, specs, project_name)
     
-    if "Error" in analysis or "failed" in analysis:
+    if "ERROR:" in analysis or "FAILED:" in analysis or analysis.startswith("Error"):
         print(f"❌ Agent 3 failed at Step 2: {analysis}")
         return False
     
