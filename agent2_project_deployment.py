@@ -122,19 +122,26 @@ def deploy_to_vercel(project_name: str) -> str:
         )
         
         if result.returncode == 0:
-            # Extract URL from Vercel output
+            # Extract URL from Vercel output - look for Production URL
             output_lines = result.stdout.split('\n')
             deployment_url = None
             
             for line in output_lines:
-                if 'https://' in line and '.vercel.app' in line:
+                if 'Production:' in line and 'https://' in line and '.vercel.app' in line:
+                    # Extract URL from "✅  Production: https://..." format
+                    url_part = line.split('https://')[1].split(' ')[0]
+                    deployment_url = f"https://{url_part}"
+                    break
+                elif 'https://' in line and '.vercel.app' in line and 'Production' not in line:
+                    # Fallback: any line with vercel.app URL
                     deployment_url = line.strip()
                     break
             
             if deployment_url:
                 return f"SUCCESS: Deployed '{project_name}' to {deployment_url}"
             else:
-                return f"SUCCESS: Deployed '{project_name}' (check Vercel dashboard for URL)"
+                # Still return success but indicate URL extraction failed
+                return f"SUCCESS: Deployed '{project_name}' - URL extraction failed, check output: {result.stdout[:200]}"
         else:
             error_msg = result.stderr[:200] if result.stderr else "Unknown error"
             return f"FAILED: Vercel deployment error - {error_msg}"
