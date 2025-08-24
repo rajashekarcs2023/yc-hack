@@ -96,7 +96,7 @@ class NotionMCPClient:
     async def search_pages(self, query: str, limit: int = 10) -> List[Dict[str, Any]]:
         """Search Notion pages using the search tool."""
         try:
-            result = await self.call_tool("search_pages", {
+            result = await self.call_tool("search", {
                 "query": query,
                 "limit": limit
             })
@@ -126,10 +126,24 @@ class NotionMCPClient:
             if parent_id:
                 arguments["parent_id"] = parent_id
                 
-            result = await self.call_tool("create_page", arguments)
+            result = await self.call_tool("create-pages", arguments)
             return result
         except Exception as e:
             logger.error(f"Error creating page: {e}")
+            return {}
+    
+    async def update_page(self, page_id: str, content: str = None, **kwargs) -> Dict[str, Any]:
+        """Update an existing Notion page."""
+        try:
+            arguments = {"page_id": page_id}
+            if content:
+                arguments["content"] = content
+            arguments.update(kwargs)
+                
+            result = await self.call_tool("update-page", arguments)
+            return result
+        except Exception as e:
+            logger.error(f"Error updating page: {e}")
             return {}
 
 
@@ -164,6 +178,12 @@ class NotionMCPService:
         if not self.initialized:
             await self.start()
         return await self.client.create_page(title, content, parent_id)
+    
+    async def update_page(self, page_id: str, content: str = None, **kwargs) -> Dict[str, Any]:
+        """Update an existing page in Notion."""
+        if not self.initialized:
+            await self.start()
+        return await self.client.update_page(page_id, content, **kwargs)
     
     async def list_available_resources(self) -> List[Dict[str, Any]]:
         """List all available Notion resources."""
