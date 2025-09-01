@@ -3,8 +3,4 @@ yc-venv
 .env    
 node_modules
 pixelpilot-v0-test
-pixelpilot-v0
-pixelpilot-project
-pixelpilot-nextjs
-pixelpilot-v1
-pixelpilot-v2
+

@@ -19,38 +19,68 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def extract_notion_specs(action: str = "extract") -> str:
-    """Extract specifications from Notion page using subprocess."""
+    """Extract specifications from Notion page using direct API call."""
     try:
-        result = subprocess.run(
-            ["python", "step1_test_notion_extraction.py"],
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
+        # Import the NotionMCPTool directly and use it to get full specs
+        import asyncio
+        from dedalus_notion_tool import NotionMCPTool
         
-        if result.returncode == 0 and "Clean specs length:" in result.stdout:
-            # Parse output to extract actual specs content
-            lines = result.stdout.split('\n')
-            specs_start = False
-            specs_lines = []
+        async def get_full_specs():
+            notion_tool = NotionMCPTool()
+            pixelpilot_page_id = "258bd31b-99b8-80b3-9a92-ffbbadb0b85f"
             
-            for line in lines:
-                if "Clean specs preview:" in line:
-                    specs_start = True
-                    continue
-                elif specs_start and line.strip() == "------------------------------":
-                    if specs_lines:  # End of specs
-                        break
-                    else:  # Start of specs
-                        continue
-                elif specs_start:
-                    specs_lines.append(line)
+            result = await notion_tool.fetch_notion_page(pixelpilot_page_id)
             
-            specs_content = '\n'.join(specs_lines).strip()
-            return f"SUCCESS: Extracted specs from Notion:\n\n{specs_content[:300]}..."
-            
-        return "FAILED: Could not extract specs from Notion"
+            if result.get("success"):
+                content = result.get("content", "")
+                
+                # Extract text from MCP response
+                if isinstance(content, list) and len(content) > 0:
+                    raw_text = content[0].text if hasattr(content[0], 'text') else str(content[0])
+                else:
+                    raw_text = str(content)
+                
+                # Parse the JSON-like response to extract clean specs
+                import json
+                try:
+                    # Try to parse as JSON first
+                    parsed = json.loads(raw_text)
+                    specs_text = parsed.get("text", raw_text)
+                    
+                    # Extract content between <content> tags if present
+                    if "<content>" in specs_text and "</content>" in specs_text:
+                        start = specs_text.find("<content>") + len("<content>")
+                        end = specs_text.find("</content>")
+                        specs_text = specs_text[start:end].strip()
+                    
+                except json.JSONDecodeError:
+                    # If not JSON, use raw text
+                    specs_text = raw_text
+                
+                return specs_text
+            else:
+                return None
         
+        # Get the full specs directly
+        specs_content = asyncio.run(get_full_specs())
+        
+        if specs_content is None:
+            return "FAILED: Could not extract specs from Notion"
+            
+        # DEBUG: Print extracted specs
+        print("=" * 60)
+        print(" DEBUG: EXTRACTED SPECS FROM NOTION")
+        print("=" * 60)
+        print(f"Specs length: {len(specs_content)} characters")
+        print("Specs content:")
+        print(specs_content)
+        print("=" * 60)
+        
+        if specs_content and len(specs_content) > 100:  # Ensure we got substantial content
+            return f"SUCCESS: Extracted specs from Notion:\n{specs_content}"
+        else:
+            return "FAILED: No substantial specs content found in Notion output"
+            
     except Exception as e:
         return f"ERROR: {str(e)}"
 
@@ -77,7 +107,28 @@ from step2_test_v0_generation import save_generated_project
 
 async def main():
     specs = '''{specs}'''
+    
+    # DEBUG: Print specs being passed to code generation
+    print("=" * 60)
+    print("🔍 DEBUG: SPECS PASSED TO CODE GENERATION")
+    print("=" * 60)
+    print(f"Specs length: {{len(specs)}} characters")
+    print("Specs content:")
+    print(specs)
+    print("=" * 60)
+    
     content, source = await generate_code_multi_api(specs)
+    
+    # DEBUG: Print generated content info
+    print("=" * 60)
+    print("🔍 DEBUG: CODE GENERATION RESULT")
+    print("=" * 60)
+    print(f"Generated content length: {{len(content)}} characters")
+    print(f"Source: {{source}}")
+    print("First 500 chars of content:")
+    print(content[:500] if content else "NO CONTENT")
+    print("=" * 60)
+    
     if content:
         success = save_generated_project(content, '{project_name}')
         if success:

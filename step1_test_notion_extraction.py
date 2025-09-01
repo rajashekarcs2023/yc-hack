@@ -54,6 +54,10 @@ async def test_notion_extraction():
             print("-" * 30)
             print(specs_text[:500] + "..." if len(specs_text) > 500 else specs_text)
             print("-" * 30)
+            print("\n📋 FULL SPECS CONTENT:")
+            print("-" * 30)
+            print(specs_text)
+            print("-" * 30)
             
             return specs_text
             

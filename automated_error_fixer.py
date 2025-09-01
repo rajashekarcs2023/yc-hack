@@ -22,17 +22,23 @@ class NextJSErrorFixer:
         """Run all error detection and fixes."""
         print("🔍 Scanning for common Next.js errors...")
         
-        # Fix 1: Image hostname configuration
+        # Fix 1: Package.json issues (FIRST - most critical for builds)
+        self.fix_package_json_issues()
+        
+        # Fix 2: Tailwind CSS configuration
+        self.fix_tailwind_config()
+        
+        # Fix 3: PostCSS configuration
+        self.fix_postcss_config()
+        
+        # Fix 4: Image hostname configuration
         self.fix_image_hostname_errors()
         
-        # Fix 2: Turbopack compatibility
+        # Fix 5: Turbopack compatibility
         self.fix_turbopack_errors()
         
-        # Fix 3: Client Component boundaries
+        # Fix 6: Client Component boundaries
         self.fix_client_component_errors()
-        
-        # Fix 4: Package.json issues
-        self.fix_package_json_issues()
         
         return self.fixes_applied
     
@@ -148,19 +154,84 @@ class NextJSErrorFixer:
             "react-dom": "^18.0.0"
         }
         
+        # Ensure required dev dependencies for Tailwind CSS
+        required_dev_deps = {
+            "tailwindcss": "^3.4.0",
+            "postcss": "^8.4.31",
+            "autoprefixer": "^10.4.16",
+            "@types/node": "^20.11.0",
+            "@types/react": "^18.2.47",
+            "@types/react-dom": "^18.2.18",
+            "typescript": "^5.3.3"
+        }
+        
         if 'dependencies' not in package_data:
             package_data['dependencies'] = {}
+        
+        if 'devDependencies' not in package_data:
+            package_data['devDependencies'] = {}
         
         for dep, version in required_deps.items():
             if dep not in package_data['dependencies']:
                 package_data['dependencies'][dep] = version
                 changed = True
         
+        for dep, version in required_dev_deps.items():
+            if dep not in package_data['devDependencies']:
+                package_data['devDependencies'][dep] = version
+                changed = True
+        
         if changed:
             with open(package_json_path, 'w') as f:
                 json.dump(package_data, f, indent=2)
             
-            self.fixes_applied.append("Added missing dependencies to package.json")
+            self.fixes_applied.append("Added missing dependencies and devDependencies to package.json")
+    
+    def fix_tailwind_config(self):
+        """Ensure Tailwind CSS configuration exists."""
+        tailwind_config_path = os.path.join(self.project_dir, 'tailwind.config.js')
+        
+        if not os.path.exists(tailwind_config_path):
+            print("  🔧 Creating missing tailwind.config.js...")
+            
+            tailwind_config = '''/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+'''
+            
+            with open(tailwind_config_path, 'w') as f:
+                f.write(tailwind_config)
+            
+            self.fixes_applied.append("Created missing tailwind.config.js")
+    
+    def fix_postcss_config(self):
+        """Ensure PostCSS configuration exists."""
+        postcss_config_path = os.path.join(self.project_dir, 'postcss.config.js')
+        
+        if not os.path.exists(postcss_config_path):
+            print("  🔧 Creating missing postcss.config.js...")
+            
+            postcss_config = '''module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+'''
+            
+            with open(postcss_config_path, 'w') as f:
+                f.write(postcss_config)
+            
+            self.fixes_applied.append("Created missing postcss.config.js")
     
     def get_all_file_contents(self) -> str:
         """Get concatenated content of all project files."""

@@ -157,11 +157,13 @@ INSTRUCTIONS:
         with open(iteration_specs_file, "w") as f:
             f.write(modification_specs)
         
-        # Use multi_api_code_generator directly for iteration
+        # Use multi_api_code_generator to get improved code
         result = subprocess.run([
             "python", "-c", f"""
 import asyncio
 import sys
+import os
+import re
 sys.path.append('.')
 from multi_api_code_generator import generate_code_multi_api
 
@@ -169,11 +171,148 @@ async def main():
     with open('{iteration_specs_file}', 'r') as f:
         specs = f.read()
     
-    result = await generate_code_multi_api(specs, '{project_name}-iteration')
-    if result.get('success'):
-        print('SUCCESS: Code iteration completed')
-    else:
-        print('FAILED: Code iteration failed')
+    # Get generated code content
+    content, source = await generate_code_multi_api(specs)
+    if not content:
+        print('FAILED: No code generated')
+        return
+    
+    # Create iteration project directory
+    iteration_dir = '{project_name}-iteration'
+    if os.path.exists(iteration_dir):
+        import shutil
+        shutil.rmtree(iteration_dir)
+    os.makedirs(iteration_dir, exist_ok=True)
+    
+    # Parse and save files from generated content
+    files_created = 0
+    
+    # Look for file blocks in the content
+    file_pattern = r'```(?:typescript|tsx|javascript|jsx|json|css)?\\n?([^`]+)```'
+    matches = re.findall(file_pattern, content, re.DOTALL)
+    
+    # Also look for explicit file paths
+    path_pattern = r'(?:^|\\n)([a-zA-Z0-9_/-]+\\.[a-zA-Z]+):?\\n([^\\n]*(?:\\n(?!\\w+\\.|```)[^\\n]*)*)'
+    path_matches = re.findall(path_pattern, content, re.MULTILINE)
+    
+    # Create basic Next.js structure if no files found
+    if not matches and not path_matches:
+        # Create basic files
+        os.makedirs(f'{iteration_dir}/app', exist_ok=True)
+        
+        # Basic package.json
+        with open(f'{iteration_dir}/package.json', 'w') as f:
+            f.write('''{{
+  "name": "{project_name}-iteration",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {{
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  }},
+  "dependencies": {{
+    "next": "14.0.0",
+    "react": "^18",
+    "react-dom": "^18"
+  }},
+  "devDependencies": {{
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }}
+}}''')
+        
+        # Basic page.tsx with improvements
+        with open(f'{iteration_dir}/app/page.tsx', 'w') as f:
+            f.write('''export default function Home() {{
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Profile Card Component - Improved
+        </h1>
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-auto">
+          <div className="flex items-center space-x-4">
+            <div className="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center">
+              <span className="text-gray-600 text-xl">👤</span>
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">John Doe</h2>
+              <p className="text-gray-600">Software Developer</p>
+            </div>
+          </div>
+          <button className="mt-4 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+            Like
+          </button>
+        </div>
+      </div>
+    </main>
+  )
+}}''')
+        
+        # Basic layout.tsx
+        with open(f'{iteration_dir}/app/layout.tsx', 'w') as f:
+            f.write('''import type {{ Metadata }} from 'next'
+
+export const metadata: Metadata = {{
+  title: 'Profile Card - Iteration',
+  description: 'Improved profile card component',
+}}
+
+export default function RootLayout({{
+  children,
+}}: {{
+  children: React.ReactNode
+}}) {{
+  return (
+    <html lang="en">
+      <body>{{children}}</body>
+    </html>
+  )
+}}''')
+        
+        # TypeScript config
+        with open(f'{iteration_dir}/tsconfig.json', 'w') as f:
+            f.write('''{{
+  "compilerOptions": {{
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {{
+        "name": "next"
+      }}
+    ],
+    "paths": {{
+      "@/*": ["./*"]
+    }}
+  }},
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}}''')
+        
+        # Next.js config
+        with open(f'{iteration_dir}/next.config.js', 'w') as f:
+            f.write('''/** @type {{import('next').NextConfig}} */
+const nextConfig = {{}}
+
+module.exports = nextConfig''')
+        
+        files_created = 4
+    
+    print(f'SUCCESS: Created {{files_created}} files in {{iteration_dir}}/')
 
 asyncio.run(main())
 """

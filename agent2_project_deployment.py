@@ -53,7 +53,23 @@ def fix_project_errors(project_name: str) -> str:
         try:
             from automated_error_fixer import auto_fix_project
             fixes = auto_fix_project(project_name)
-            return f"SUCCESS: Applied {len(fixes)} automatic fixes to '{project_name}'"
+            
+            # Also run npm install after fixing dependencies
+            if any("dependencies" in fix for fix in fixes):
+                print(f"📦 Running npm install after dependency fixes...")
+                result = subprocess.run(
+                    ["npm", "install"],
+                    cwd=project_name,
+                    capture_output=True,
+                    text=True,
+                    timeout=120
+                )
+                if result.returncode == 0:
+                    fixes.append("Installed updated dependencies")
+                else:
+                    fixes.append(f"Warning: npm install failed - {result.stderr[:100]}")
+            
+            return f"SUCCESS: Applied {len(fixes)} automatic fixes to '{project_name}': {', '.join(fixes)}"
         except ImportError:
             # Basic error fixing without the module
             return f"SUCCESS: Basic error checking completed for '{project_name}'"
@@ -62,26 +78,26 @@ def fix_project_errors(project_name: str) -> str:
         return f"ERROR: {str(e)}"
 
 def test_dev_server(project_name: str) -> str:
-    """Test that the development server can start successfully."""
+    """Test that the project builds successfully before deployment."""
     try:
         if not os.path.exists(project_name):
             return f"FAILED: Project directory '{project_name}' not found"
         
-        print(f"🚀 Testing dev server for {project_name}...")
-        # Start dev server in background and test
-        process = subprocess.Popen(
-            ["npm", "run", "dev"],
+        print(f"🚀 Testing build for {project_name}...")
+        # Test build instead of dev server - more reliable for deployment
+        result = subprocess.run(
+            ["npm", "run", "build"],
             cwd=project_name,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            capture_output=True,
+            text=True,
+            timeout=180
         )
         
-        # Wait a few seconds then terminate
-        time.sleep(5)
-        process.terminate()
-        process.wait()
-        
-        return f"SUCCESS: Development server started successfully for '{project_name}'"
+        if result.returncode == 0:
+            return f"SUCCESS: Project builds successfully for '{project_name}'"
+        else:
+            error_msg = result.stderr[:300] if result.stderr else "Unknown build error"
+            return f"FAILED: Build failed for '{project_name}' - {error_msg}"
         
     except Exception as e:
         return f"ERROR: {str(e)}"
@@ -129,13 +145,18 @@ def deploy_to_vercel(project_name: str) -> str:
             for line in output_lines:
                 if 'Production:' in line and 'https://' in line and '.vercel.app' in line:
                     # Extract URL from "✅  Production: https://..." format
-                    url_part = line.split('https://')[1].split(' ')[0]
-                    deployment_url = f"https://{url_part}"
-                    break
-                elif 'https://' in line and '.vercel.app' in line and 'Production' not in line:
+                    import re
+                    url_match = re.search(r'https://[^\s]+\.vercel\.app', line)
+                    if url_match:
+                        deployment_url = url_match.group(0)
+                        break
+                elif 'https://' in line and '.vercel.app' in line:
                     # Fallback: any line with vercel.app URL
-                    deployment_url = line.strip()
-                    break
+                    import re
+                    url_match = re.search(r'https://[^\s]+\.vercel\.app', line)
+                    if url_match:
+                        deployment_url = url_match.group(0)
+                        break
             
             if deployment_url:
                 return f"SUCCESS: Deployed '{project_name}' to {deployment_url}"
