@@ -368,7 +368,7 @@ MIT License - see LICENSE file for details
 
 ## 📧 Contact
 
-Built by Radhika Danda for YC Hackathon
+Built by Rajashekar Vennavelli for YC Hackathon
 
 **Project Link:** [https://github.com/rajashekarcs2023/yc-hack](https://github.com/rajashekarcs2023/yc-hack)
 
