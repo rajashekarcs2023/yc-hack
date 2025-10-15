@@ -179,8 +179,8 @@ PixelPilot consists of four specialized agents that form an automated developmen
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/yourusername/pixelpilot.git
-cd pixelpilot
+git clone https://github.com/rajashekarcs2023/yc-hack.git
+cd yc-hack
 ```
 
 2. **Set up Python environment:**
@@ -370,7 +370,7 @@ MIT License - see LICENSE file for details
 
 Built by Radhika Danda for YC Hackathon
 
-**Project Link:** [https://github.com/yourusername/pixelpilot](https://github.com/yourusername/pixelpilot)
+**Project Link:** [https://github.com/rajashekarcs2023/yc-hack](https://github.com/rajashekarcs2023/yc-hack)
 
 ---
 
