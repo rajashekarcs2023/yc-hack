@@ -378,6 +378,6 @@ Built by Rajashekar Vennavelli for YC Hackathon
 
 **⭐ Star this repo if you find it useful!**
 
-Made with ❤️ using [Dedalus](https://dedalus.ai)
+Made with ❤️ using [Dedalus](https://www.dedaluslabs.ai/)
 
 </div>
