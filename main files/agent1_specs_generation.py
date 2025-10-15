@@ -107,7 +107,7 @@ asyncio.run(main())
 
 async def main():
     """Agent 1: Extract specs and generate code."""
-    print("🤖 Agent 1: Specs Extraction + Code Generation")
+    print("Agent 1: Specs Extraction + Code Generation")
     print("=" * 50)
     
     client = AsyncDedalus()
@@ -119,7 +119,7 @@ async def main():
         tools=[extract_notion_specs, generate_v0_code]
     )
 
-    print(f"🎉 Agent 1 Result:\n{result.final_output}")
+    print(f"Agent 1 Result:\n{result.final_output}")
     return result.final_output
 
 if __name__ == "__main__":

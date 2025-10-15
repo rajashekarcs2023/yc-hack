@@ -18,7 +18,7 @@ load_dotenv()
 
 def extract_specs() -> str:
     """Tool 1: Extract specifications from Notion page using subprocess (same as Agent 1)"""
-    print("🔍 Extracting specs from Notion...")
+    print("Extracting specs from Notion...")
     
     try:
         result = subprocess.run(
@@ -47,22 +47,22 @@ def extract_specs() -> str:
                     specs_lines.append(line)
             
             specs_content = '\n'.join(specs_lines).strip()
-            print("✅ Specs extracted successfully")
+            print("Specs extracted successfully")
             return specs_content
             
-        print("❌ Could not extract specs from Notion")
+        print("Could not extract specs from Notion")
         return "FAILED: Could not extract specs from Notion"
         
     except subprocess.TimeoutExpired:
-        print("❌ Specs extraction timed out")
+        print("Specs extraction timed out")
         return "ERROR: Specs extraction timed out"
     except Exception as e:
-        print(f"❌ Specs extraction error: {e}")
+        print(f"Specs extraction error: {e}")
         return f"ERROR: {str(e)}"
 
 def browser_test_analysis(url: str, specs: str, project_name: str = "pixelpilot-project") -> str:
     """Tool 2: Test deployed app using Browser Use with spec comparison"""
-    print(f"🎭 Testing deployed app: {url}")
+    print(f"Testing deployed app: {url}")
     
     try:
         # Create a temporary file with specs for the subprocess
@@ -155,25 +155,25 @@ asyncio.run(main())
             output = result.stdout
             if "ANALYSIS_START" in output and "ANALYSIS_END" in output:
                 analysis = output.split("ANALYSIS_START")[1].split("ANALYSIS_END")[0].strip()
-                print("✅ Browser testing completed")
+                print("Browser testing completed")
                 return analysis
             else:
-                print("✅ Browser testing completed (check logs)")
+                print("Browser testing completed (check logs)")
                 return "Browser testing completed - see logs for details"
         else:
-            print(f"❌ Browser testing failed: {result.stderr}")
+            print(f"Browser testing failed: {result.stderr}")
             return f"Browser testing failed: {result.stderr}"
             
     except subprocess.TimeoutExpired:
-        print("❌ Browser testing timed out")
+        print("Browser testing timed out")
         return "Browser testing timed out"
     except Exception as e:
-        print(f"❌ Browser testing error: {e}")
+        print(f"Browser testing error: {e}")
         return f"Error: {str(e)}"
 
 def generate_summary(analysis: str, specs: str) -> str:
     """Tool 3: Generate summary comparing implementation to specs"""
-    print("📊 Generating spec comparison summary...")
+    print("Generating spec comparison summary...")
     
     try:
         # Extract key findings from analysis
@@ -211,16 +211,16 @@ RECOMMENDATIONS FOR NEXT ITERATION:
 PRIORITY: HIGH - Missing core feature (profile picture)
 """
         
-        print("✅ Summary generated")
+        print("Summary generated")
         return summary.strip()
         
     except Exception as e:
-        print(f"❌ Summary generation error: {e}")
+        print(f"Summary generation error: {e}")
         return f"Error generating summary: {str(e)}"
 
 def write_feedback_to_pixelpilot(summary: str, project_name: str = "pixelpilot-project") -> str:
     """Tool 4: Write feedback to pixelpilot document using working notion-update-page"""
-    print("📝 Writing feedback to pixelpilot document...")
+    print("Writing feedback to pixelpilot document...")
     
     try:
         timestamp = datetime.now().isoformat()[:19]
@@ -325,54 +325,54 @@ asyncio.run(main())
         ], capture_output=True, text=True, timeout=60)
         
         if result.returncode == 0 and "SUCCESS" in result.stdout:
-            print("✅ Feedback written to pixelpilot document")
+            print("Feedback written to pixelpilot document")
             return "Successfully added feedback to pixelpilot document"
         else:
-            print(f"❌ Feedback write failed: {result.stderr}")
+            print(f"Feedback write failed: {result.stderr}")
             return f"Failed to write feedback: {result.stderr}"
             
     except subprocess.TimeoutExpired:
-        print("❌ Feedback write timed out")
+        print("Feedback write timed out")
         return "Feedback write timed out"
     except Exception as e:
-        print(f"❌ Feedback write error: {e}")
+        print(f"Feedback write error: {e}")
         return f"Error: {str(e)}"
 
 # Main Agent 3 workflow
 async def run_agent3_workflow(url: str, project_name: str = "pixelpilot-project"):
     """Complete Agent 3 workflow: Extract specs -> Test app -> Write to Notion"""
     
-    print("🚀 Starting Agent 3: Browser Testing and Analysis")
+    print("Starting Agent 3: Browser Testing and Analysis")
     print("=" * 60)
     
     start_time = datetime.now()
     
     # Step 1: Extract specs from Notion
-    print("\n📋 STEP 1: Extracting specifications from Notion")
+    print("\nSTEP 1: Extracting specifications from Notion")
     specs = extract_specs()
     
     if "Error" in specs or "No specifications" in specs:
-        print(f"❌ Agent 3 failed at Step 1: {specs}")
+        print(f"Agent 3 failed at Step 1: {specs}")
         return False
     
     # Step 2: Browser testing with spec analysis
-    print(f"\n🎭 STEP 2: Testing deployed app with spec comparison")
+    print(f"\nSTEP 2: Testing deployed app with spec comparison")
     analysis = browser_test_analysis(url, specs, project_name)
     
     if "ERROR:" in analysis or "FAILED:" in analysis or analysis.startswith("Error"):
-        print(f"❌ Agent 3 failed at Step 2: {analysis}")
+        print(f"Agent 3 failed at Step 2: {analysis}")
         return False
     
     # Step 3: Generate summary comparing implementation to specs
-    print(f"\n📊 STEP 3: Generating spec comparison summary")
+    print(f"\nSTEP 3: Generating spec comparison summary")
     summary = generate_summary(analysis, specs)
     
     if "Error" in summary:
-        print(f"❌ Agent 3 failed at Step 3: {summary}")
+        print(f"Agent 3 failed at Step 3: {summary}")
         return False
     
     # Step 4: Write feedback to pixelpilot document
-    print(f"\n📝 STEP 4: Writing feedback to pixelpilot document")
+    print(f"\nSTEP 4: Writing feedback to pixelpilot document")
     feedback_result = write_feedback_to_pixelpilot(summary, project_name)
     
     # Summary
@@ -380,14 +380,14 @@ async def run_agent3_workflow(url: str, project_name: str = "pixelpilot-project"
     duration = (end_time - start_time).total_seconds()
     
     print("\n" + "=" * 60)
-    print("🎯 AGENT 3 WORKFLOW COMPLETE")
+    print("AGENT 3 WORKFLOW COMPLETE")
     print("=" * 60)
-    print(f"✅ Specs Extraction: Success")
-    print(f"✅ Browser Testing: Success") 
-    print(f"✅ Summary Generation: Success")
-    print(f"✅ Feedback Documentation: {'Success' if 'Successfully' in feedback_result else 'Failed'}")
-    print(f"⏱️  Total Duration: {duration:.1f} seconds")
-    print(f"🌐 Tested URL: {url}")
+    print(f"Specs Extraction: Success")
+    print(f"Browser Testing: Success") 
+    print(f"Summary Generation: Success")
+    print(f"Feedback Documentation: {'Success' if 'Successfully' in feedback_result else 'Failed'}")
+    print(f"Total Duration: {duration:.1f} seconds")
+    print(f"Tested URL: {url}")
     
     return "Successfully" in feedback_result
 
@@ -399,7 +399,7 @@ async def test_agent3():
     return result
 
 if __name__ == "__main__":
-    print("🤖 Agent 3: Browser Testing and Analysis")
+    print("Agent 3: Browser Testing and Analysis")
     print("=" * 50)
     
     # Test the complete workflow

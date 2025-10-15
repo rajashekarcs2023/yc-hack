@@ -24,7 +24,7 @@ load_dotenv()
 
 def extract_feedback(project_name: str = "pixelpilot-project") -> str:
     """Tool 1: Extract latest feedback from Notion pixelpilot document"""
-    print("📖 Extracting feedback from Notion...")
+    print("Extracting feedback from Notion...")
     
     try:
         result = subprocess.run([
@@ -60,21 +60,21 @@ def extract_feedback(project_name: str = "pixelpilot-project") -> str:
             
             if feedback_sections:
                 latest_feedback = feedback_sections[-1]  # Get most recent feedback
-                print("✅ Latest feedback extracted successfully")
+                print("Latest feedback extracted successfully")
                 return f"SUCCESS: Latest feedback extracted:\n\n{latest_feedback}"
             else:
-                print("⚠️ No feedback sections found")
+                print("No feedback sections found")
                 return "NO_FEEDBACK: No feedback sections found in document"
             
         return "FAILED: Could not extract content from Notion"
         
     except Exception as e:
-        print(f"❌ Feedback extraction error: {e}")
+        print(f"Feedback extraction error: {e}")
         return f"ERROR: {str(e)}"
 
 def analyze_feedback(feedback: str) -> str:
     """Tool 2: Parse feedback into actionable items"""
-    print("🔍 Analyzing feedback for actionable items...")
+    print("Analyzing feedback for actionable items...")
     
     try:
         if "NO_FEEDBACK" in feedback or "FAILED" in feedback:
@@ -105,16 +105,16 @@ def analyze_feedback(feedback: str) -> str:
             "priority": "HIGH" if missing_features else "MEDIUM"
         }
         
-        print("✅ Feedback analysis completed")
+        print("Feedback analysis completed")
         return f"SUCCESS: Feedback analysis:\n{json.dumps(analysis, indent=2)}"
         
     except Exception as e:
-        print(f"❌ Feedback analysis error: {e}")
+        print(f"Feedback analysis error: {e}")
         return f"ERROR: {str(e)}"
 
 def modify_code(analysis: str, project_name: str = "pixelpilot-project") -> str:
     """Tool 3: Use AI to modify existing code based on feedback"""
-    print("🛠️ Modifying code based on feedback...")
+    print("Modifying code based on feedback...")
     
     try:
         if "ERROR" in analysis or "NO_FEEDBACK" in analysis:
@@ -126,13 +126,13 @@ def modify_code(analysis: str, project_name: str = "pixelpilot-project") -> str:
         recommendations = analysis_data.get("recommendations", [])
         
         if not missing_features and not recommendations:
-            print("⚠️ No actionable items found")
+            print("No actionable items found")
             return "NO_CHANGES: No actionable items found in feedback"
         
         # Find the project directory
         project_dir = f"./{project_name}"
         if not os.path.exists(project_dir):
-            print(f"❌ Project directory not found: {project_dir}")
+            print(f"Project directory not found: {project_dir}")
             return f"ERROR: Project directory not found: {project_dir}"
         
         # Create simple modification using Agent 1 pattern
@@ -184,19 +184,19 @@ asyncio.run(main())
             os.remove(iteration_specs_file)
         
         if result.returncode == 0 and "SUCCESS" in result.stdout:
-            print("✅ Code modifications completed")
+            print("Code modifications completed")
             return "SUCCESS: Code modified based on feedback"
         else:
-            print(f"❌ Code modification failed: {result.stderr}")
+            print(f"Code modification failed: {result.stderr}")
             return f"FAILED: Code modification failed: {result.stderr}"
             
     except Exception as e:
-        print(f"❌ Code modification error: {e}")
+        print(f"Code modification error: {e}")
         return f"ERROR: {str(e)}"
 
 def validate_changes(project_name: str = "pixelpilot-project") -> str:
     """Tool 4: Basic validation of code changes"""
-    print("✅ Validating code changes...")
+    print("Validating code changes...")
     
     try:
         project_dir = f"./{project_name}"
@@ -221,51 +221,51 @@ def validate_changes(project_name: str = "pixelpilot-project") -> str:
                 if file.endswith('.tsx'):
                     tsx_files.append(os.path.join(root, file))
         
-        print(f"✅ Found {len(tsx_files)} TypeScript files")
-        print("✅ Basic validation completed")
+        print(f"Found {len(tsx_files)} TypeScript files")
+        print("Basic validation completed")
         return f"SUCCESS: Validation passed - {len(tsx_files)} files checked"
         
     except Exception as e:
-        print(f"❌ Validation error: {e}")
+        print(f"Validation error: {e}")
         return f"ERROR: {str(e)}"
 
 async def run_agent4_workflow(project_name: str = "pixelpilot-project"):
     """Main Agent 4 workflow"""
-    print("🚀 Starting Agent 4: Feedback-Based Code Iteration")
+    print("Starting Agent 4: Feedback-Based Code Iteration")
     print("=" * 60)
     
     start_time = datetime.now()
     
     # Step 1: Extract feedback from Notion
-    print("\n📖 STEP 1: Extracting feedback from Notion")
+    print("\nSTEP 1: Extracting feedback from Notion")
     feedback = extract_feedback(project_name)
     
     if "ERROR" in feedback or "NO_FEEDBACK" in feedback:
-        print(f"❌ Agent 4 failed at Step 1: {feedback}")
+        print(f"Agent 4 failed at Step 1: {feedback}")
         return False
     
     # Step 2: Analyze feedback for actionable items
-    print("\n🔍 STEP 2: Analyzing feedback for actionable items")
+    print("\nSTEP 2: Analyzing feedback for actionable items")
     analysis = analyze_feedback(feedback)
     
     if "ERROR" in analysis:
-        print(f"❌ Agent 4 failed at Step 2: {analysis}")
+        print(f"Agent 4 failed at Step 2: {analysis}")
         return False
     
     # Step 3: Modify code based on feedback
-    print("\n🛠️ STEP 3: Modifying code based on feedback")
+    print("\nSTEP 3: Modifying code based on feedback")
     modifications = modify_code(analysis, project_name)
     
     if "ERROR" in modifications:
-        print(f"❌ Agent 4 failed at Step 3: {modifications}")
+        print(f"Agent 4 failed at Step 3: {modifications}")
         return False
     
     # Step 4: Validate changes
-    print("\n✅ STEP 4: Validating code changes")
+    print("\nSTEP 4: Validating code changes")
     validation = validate_changes(project_name)
     
     if "ERROR" in validation:
-        print(f"❌ Agent 4 failed at Step 4: {validation}")
+        print(f"Agent 4 failed at Step 4: {validation}")
         return False
     
     # Success!
@@ -273,14 +273,14 @@ async def run_agent4_workflow(project_name: str = "pixelpilot-project"):
     duration = (end_time - start_time).total_seconds()
     
     print("\n" + "=" * 60)
-    print("🎉 AGENT 4 WORKFLOW COMPLETE!")
+    print("AGENT 4 WORKFLOW COMPLETE!")
     print("=" * 60)
-    print(f"📖 Feedback Extraction: ✅")
-    print(f"🔍 Feedback Analysis: ✅")
-    print(f"🛠️ Code Modifications: ✅")
-    print(f"✅ Validation: ✅")
-    print(f"⏱️  Total Duration: {duration:.1f} seconds")
-    print(f"📁 Project: {project_name}")
+    print(f"Feedback Extraction: Success")
+    print(f"Feedback Analysis: Success")
+    print(f"Code Modifications: Success")
+    print(f"Validation: Success")
+    print(f"Total Duration: {duration:.1f} seconds")
+    print(f"Project: {project_name}")
     print("=" * 60)
     
     return True

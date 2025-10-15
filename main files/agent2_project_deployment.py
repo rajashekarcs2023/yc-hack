@@ -26,7 +26,7 @@ def install_dependencies(project_name: str) -> str:
         if not os.path.exists(project_name):
             return f"FAILED: Project directory '{project_name}' not found"
         
-        print(f"📦 Installing dependencies for {project_name}...")
+        print(f"Installing dependencies for {project_name}...")
         result = subprocess.run(
             ["npm", "install"],
             cwd=project_name,
@@ -49,7 +49,7 @@ def fix_project_errors(project_name: str) -> str:
         if not os.path.exists(project_name):
             return f"FAILED: Project directory '{project_name}' not found"
         
-        print(f"🔧 Fixing errors in {project_name}...")
+        print(f"Fixing errors in {project_name}...")
         try:
             from automated_error_fixer import auto_fix_project
             fixes = auto_fix_project(project_name)
@@ -67,7 +67,7 @@ def test_dev_server(project_name: str) -> str:
         if not os.path.exists(project_name):
             return f"FAILED: Project directory '{project_name}' not found"
         
-        print(f"🚀 Testing dev server for {project_name}...")
+        print(f"Testing dev server for {project_name}...")
         # Start dev server in background and test
         process = subprocess.Popen(
             ["npm", "run", "dev"],
@@ -92,7 +92,7 @@ def deploy_to_vercel(project_name: str) -> str:
         if not os.path.exists(project_name):
             return f"FAILED: Project directory '{project_name}' not found"
         
-        print(f"🌐 Deploying {project_name} to Vercel...")
+        print(f"Deploying {project_name} to Vercel...")
         
         # Check if Vercel CLI is installed
         try:
@@ -145,11 +145,11 @@ def deploy_to_vercel(project_name: str) -> str:
 async def main(project_name: str = None):
     """Agent 2: Install, fix, test, and deploy project."""
     if not project_name:
-        print("❌ Error: Project name required for Agent 2")
+        print("Error: Project name required for Agent 2")
         return
     
-    print(f"🤖 Agent 2: Project Management + Deployment")
-    print(f"📁 Working with project: {project_name}")
+    print(f"Agent 2: Project Management + Deployment")
+    print(f"Working with project: {project_name}")
     print("=" * 50)
     
     client = AsyncDedalus()
@@ -161,7 +161,7 @@ async def main(project_name: str = None):
         tools=[install_dependencies, fix_project_errors, test_dev_server, deploy_to_vercel]
     )
 
-    print(f"🎉 Agent 2 Result:\n{result.final_output}")
+    print(f"Agent 2 Result:\n{result.final_output}")
     return result.final_output
 
 if __name__ == "__main__":
