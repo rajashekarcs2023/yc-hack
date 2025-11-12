@@ -22,7 +22,7 @@ def extract_notion_specs(action: str = "extract") -> str:
     """Extract specifications from Notion page using subprocess."""
     try:
         result = subprocess.run(
-            ["python", "step1_test_notion_extraction.py"],
+            ["python", "utils/step1_test_notion_extraction.py"],
             capture_output=True,
             text=True,
             timeout=30
@@ -72,8 +72,8 @@ import asyncio
 import sys
 import os
 sys.path.append('.')
-from multi_api_code_generator import generate_code_multi_api
-from step2_test_v0_generation import save_generated_project
+from utils.multi_api_code_generator import generate_code_multi_api
+from utils.step2_test_v0_generation import save_generated_project
 
 async def main():
     specs = '''{specs}'''

@@ -51,7 +51,7 @@ def fix_project_errors(project_name: str) -> str:
         
         print(f"Fixing errors in {project_name}...")
         try:
-            from automated_error_fixer import auto_fix_project
+            from utils.automated_error_fixer import auto_fix_project
             fixes = auto_fix_project(project_name)
             return f"SUCCESS: Applied {len(fixes)} automatic fixes to '{project_name}'"
         except ImportError:

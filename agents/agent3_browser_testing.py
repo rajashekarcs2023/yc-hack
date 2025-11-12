@@ -22,7 +22,7 @@ def extract_specs() -> str:
     
     try:
         result = subprocess.run(
-            ["python", "step1_test_notion_extraction.py"],
+            ["python", "utils/step1_test_notion_extraction.py"],
             capture_output=True,
             text=True,
             timeout=30
@@ -243,7 +243,7 @@ import asyncio
 import json
 import sys
 sys.path.append('.')
-from dedalus_notion_tool import NotionMCPTool
+from mcp_clients.dedalus_notion_tool import NotionMCPTool
 
 async def main():
     try:

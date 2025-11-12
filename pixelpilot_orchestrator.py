@@ -26,7 +26,7 @@ async def run_agent1():
     try:
         # Start the process
         process = subprocess.Popen(
-            ["python", "agent1_specs_generation.py"],
+            ["python", "agents/agent1_specs_generation.py"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -96,7 +96,7 @@ async def run_agent2(project_name):
     try:
         # Start the process
         process = subprocess.Popen(
-            ["python", "agent2_project_deployment.py", project_name],
+            ["python", "agents/agent2_project_deployment.py", project_name],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -154,7 +154,7 @@ async def run_agent3(deployment_url, project_name):
 import asyncio
 import sys
 sys.path.append('.')
-from agent3_browser_testing import run_agent3_workflow
+from agents.agent3_browser_testing import run_agent3_workflow
 
 async def main():
     url = "{deployment_url}"
